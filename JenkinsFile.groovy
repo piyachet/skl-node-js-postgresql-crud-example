@@ -22,7 +22,8 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    docker.build("${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}")
+                          sh "npm install"
+                          sh "docker build -t ${DOCKER_IMAGE_NAME} ."
                 }
             }
         }
