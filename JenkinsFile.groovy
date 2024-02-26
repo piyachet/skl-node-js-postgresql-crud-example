@@ -4,16 +4,16 @@ pipeline {
     environment {
         EKS_CLUSTER_NAME = 'skl-cluster'
         AWS_DEFAULT_REGION = 'ap-southeast-1'
+        DOCKER_IMAGE_NAME = 'piyachet/skl-nodejs'
+        DOCKER_HUB_CREDENTIALS = 'dckr_pat_ivs5khrmSW1lYHsrx53pU6obdo0'
     }
     
     stages {
         stage('Initialization') {
             steps {
                 script {
-                    // Clean workspace
                     deleteDir()
                     
-                    // Checkout code from repository
                     git branch: 'main', url: 'https://github.com/piyachet/skl-node-js-postgresql-crud-example.git'
                 }
             }
@@ -22,22 +22,25 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    // Build Docker image
-                    docker.build('skl-crud-nodejs')
+                    docker.build("${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}")
                 }
             }
         }
         
-        stage('Deploy to EKS') {
+        stage('Push to Docker Hub') {
             steps {
                 script {
-                    // Authenticate with EKS cluster
-                    withAWS(credentials: 'aws-credentials-id', region: AWS_DEFAULT_REGION) {
-                        sh "aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME}"
+                    // Login to Docker Hub
+                    withCredentials([usernamePassword(credentialsId: DOCKER_HUB_CREDENTIALS, usernameVariable: 'DOCKER_HUB_USERNAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+                        sh "docker login -u ${DOCKER_HUB_USERNAME} -p ${DOCKER_HUB_PASSWORD}"
                     }
                     
-                    // Apply Kubernetes manifests
-                    sh "kubectl apply -f path/to/your/kubernetes/manifests"
+                    // Push Docker image to Docker Hub
+                    docker.image("${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}").push()
+                    
+                    // Optionally, tag and push latest version
+                    docker.image("${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}").tag("${DOCKER_IMAGE_NAME}:latest")
+                    docker.image("${DOCKER_IMAGE_NAME}:latest").push()
                 }
             }
         }
