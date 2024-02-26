@@ -1,54 +1,43 @@
 pipeline {
     agent any
-
-    parameters {
-        choice(name: 'ENVIRONMENT', choices: ['Staging', 'Production'], description: 'Select environment to deploy')
+    
+    environment {
+        EKS_CLUSTER_NAME = 'your-cluster-name'
+        AWS_DEFAULT_REGION = 'your-region'
     }
-
+    
     stages {
-        stage('Initialize') {
+        stage('Initialization') {
             steps {
                 script {
-                    def appPort
-                    def cloudSQLInstance
-                    if (params.ENVIRONMENT == 'Staging') {
-                        appPort = 4000
-                        cloudSQLInstance = 'staging-instance'
-                    } else {
-                        appPort = 3000
-                        cloudSQLInstance = 'production-instance'
-                    }
-
-                    sh 'gcloud container clusters create my-cluster --num-nodes=3 --zone=us-central1-a'
-
-                    sh "gcloud sql instances create ${cloudSQLInstance} --zone=us-central1-a"
-                    sh "gcloud sql databases create mydatabase --instance=${cloudSQLInstance} --charset=utf8 --collation=utf8_general_ci"
-                    sh "gcloud sql users create user --instance=${cloudSQLInstance} --password=password"
+                    // Clean workspace
+                    deleteDir()
+                    
+                    // Checkout code from repository
+                    git branch: 'main', url: 'https://github.com/piyachet/skl-node-js-postgresql-crud-example.git'
                 }
             }
         }
+        
         stage('Build') {
             steps {
-                sh 'npm install'
-            }
-        }
-        stage('Deploy') {
-            steps {
                 script {
-                    sh "kubectl apply -f kubernetes/deployment.yaml --namespace=${params.ENVIRONMENT.toLowerCase()}"
-                    sh "kubectl expose deployment/my-app --type=LoadBalancer --port=${appPort} --target-port=80 --namespace=${params.ENVIRONMENT.toLowerCase()}"
+                    // Build Docker image
+                    docker.build('skl-crud-nodejs')
                 }
             }
         }
-    }
-
-    post {
-        success {
-            script {
-                def cpuUsage = sh(script: "kubectl top pods --no-headers --namespace=${params.ENVIRONMENT.toLowerCase()} | awk '{print \$2}'", returnStdout: true).trim()
-                def cpuUsagePercentage = cpuUsage.toInteger()
-                if (cpuUsagePercentage >= 50) {
-                    sh "kubectl scale deployment/my-app --replicas=5 --namespace=${params.ENVIRONMENT.toLowerCase()}"
+        
+        stage('Deploy to EKS') {
+            steps {
+                script {
+                    // Authenticate with EKS cluster
+                    withAWS(credentials: 'aws-credentials-id', region: AWS_DEFAULT_REGION) {
+                        sh "aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME}"
+                    }
+                    
+                    // Apply Kubernetes manifests
+                    sh "kubectl apply -f path/to/your/kubernetes/manifests"
                 }
             }
         }
