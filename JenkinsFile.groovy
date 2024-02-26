@@ -47,29 +47,23 @@
 //     }
 // }
 
+
 pipeline {
-  agent any
-    
-  stages {
-        
-    stage('Git') {
-      steps {
-        git 'https://github.com/piyachet/skl-node-js-postgresql-crud-example.git'
-      }
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                git 'https://github.com/piyachet/skl-node-js-postgresql-crud-example.git'
+                sh 'docker build -t piyachet/skl-nodejs:${BUILD_NUMBER} .'
+            }
+        }
+        stage('Push') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
+                    sh 'docker push my-image:${BUILD_NUMBER}'
+                }
+            }
+        }
     }
-     
-    stage('Build') {
-      steps {
-        sh 'npm install'
-         sh 'docker build -t skl-nodejs .'
-      }
-    }  
-    
-            
-    stage('Test') {
-      steps {
-        sh 'node test'
-      }
-    }
-  }
 }
