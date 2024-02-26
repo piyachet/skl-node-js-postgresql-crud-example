@@ -22,7 +22,7 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    docker.build("${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}", "-f Dockerfile .")
+                    docker.build("${DOCKER_IMAGE_NAME}:latest", "-f Dockerfile .")
                 }
             }
         }
