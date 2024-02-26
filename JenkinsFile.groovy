@@ -2,8 +2,8 @@ pipeline {
     agent any
     
     environment {
-        EKS_CLUSTER_NAME = 'your-cluster-name'
-        AWS_DEFAULT_REGION = 'your-region'
+        EKS_CLUSTER_NAME = 'skl-cluster'
+        AWS_DEFAULT_REGION = 'ap-southeast-1'
     }
     
     stages {
