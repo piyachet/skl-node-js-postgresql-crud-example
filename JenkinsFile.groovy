@@ -22,8 +22,7 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                          sh "npm install"
-                          sh "docker build -t ${DOCKER_IMAGE_NAME} ."
+                          docker.build('piyachet/skl-nodejs')
                 }
             }
         }
