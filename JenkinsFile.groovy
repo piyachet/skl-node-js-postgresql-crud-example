@@ -50,18 +50,32 @@
 
 pipeline {
     agent any
+    
+    environment {
+        DOCKER_IMAGE_NAME = 'piyachet/skl-nodejs'
+    }
+    
     stages {
-        stage('Build') {
+        stage('Checkout') {
             steps {
                 git 'https://github.com/piyachet/skl-node-js-postgresql-crud-example.git'
-                sh 'docker build -t piyachet/skl-nodejs:${BUILD_NUMBER} .'
             }
         }
-        stage('Push') {
+        
+        stage('Build Docker Image') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
-                    sh 'docker push my-image:${BUILD_NUMBER}'
+                script {
+                    docker.build(DOCKER_IMAGE_NAME, "-f Dockerfile .")
+                }
+            }
+        }
+        
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('https://your_registry_url', 'your_registry_credentials_id') {
+                        docker.image(DOCKER_IMAGE_NAME).push('latest')
+                    }
                 }
             }
         }
