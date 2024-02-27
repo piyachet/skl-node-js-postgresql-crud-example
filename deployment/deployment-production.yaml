@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: skl-crud
+  name: skl-crud-production
   namespace: production
   labels:
     app: skl-crud
@@ -41,3 +41,18 @@ spec:
       target:
         type: Utilization
         averageUtilization: 50
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: skl-crud-service-production
+  namespace: staging
+spec:
+  type: NodePort
+  selector:
+    app: skl-crud
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 30000
