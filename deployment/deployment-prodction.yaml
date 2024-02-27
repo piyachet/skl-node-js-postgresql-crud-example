@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: skl-crud
-  namespace: prodction
+  namespace: production
   labels:
     app: skl-crud
 spec:
@@ -21,20 +21,22 @@ spec:
         ports:
         - containerPort: 3000
 ---
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: skl-crud-hpa
-  namespace: prodction
+   name: skl-crud-hpa
+   namespace: production
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
     name: skl-crud
-  minReplicas: 2
-  maxReplicas: 5
+  minReplicas: 1
+  maxReplicas: 10
   metrics:
   - type: Resource
     resource:
       name: cpu
-      targetAverageUtilization: 50
+      target:
+        type: Utilization
+        averageUtilization: 50
