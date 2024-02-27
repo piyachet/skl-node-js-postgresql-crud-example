@@ -1,5 +1,5 @@
 module.exports = {
-  HOST: "skl-crud-nodejs.crigquc2s6l4.ap-southeast-1.rds.amazonaws.com",
+  HOST: "192.168.192.27",
   USER: "postgres",
   PASSWORD: "password",
   DB: "testdb",
