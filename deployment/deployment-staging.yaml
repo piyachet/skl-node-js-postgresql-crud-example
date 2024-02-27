@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: skl-crud
+  namespace: staging
+  labels:
+    app: skl-crud
+spec:
+  replicas: 2 # 2 pods standby
+  selector:
+    matchLabels:
+      app: skl-crud
+  template:
+    metadata:
+      labels:
+        app: skl-crud
+    spec:
+      containers:
+      - name: skl-crud
+        image: piyachet/skl-nodejs:latest
+        ports:
+        - containerPort: 3000
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: skl-crud-hpa
+  namespace: staging
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: skl-crud
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      targetAverageUtilization: 50
