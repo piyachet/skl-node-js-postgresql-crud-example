@@ -4,7 +4,12 @@ module.exports = {
   PASSWORD: "password",
   DB: "testdb",
   dialect: "postgres",
-  ssl: false,
+  dialectOptions: {
+  ssl: {
+    require: true, // This will help you. But you will see nwe error
+     rejectUnauthorized: false // This line will fix new error
+  }
+},
   pool: {
     max: 5,
     min: 0,
