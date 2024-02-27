@@ -69,6 +69,7 @@ app.listen(PORT, () => {
     database: 'testdb',
     password: 'password',
     port: 5432, // default PostgreSQL port
+    ssl: false
   });
 
   client.connect()
