@@ -4,6 +4,7 @@ module.exports = {
   PASSWORD: "password",
   DB: "testdb",
   dialect: "postgres",
+  ssl: false,
   pool: {
     max: 5,
     min: 0,
