@@ -46,7 +46,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: skl-crud-service-production
-  namespace: staging
+  namespace: production
 spec:
   type: NodePort
   selector:
