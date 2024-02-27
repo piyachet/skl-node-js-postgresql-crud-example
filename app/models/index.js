@@ -2,7 +2,7 @@ const dbConfig = require("../config/db.config.js");
 
 const Sequelize = require("sequelize");
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
-  host: "skl-crud-nodejs.crigquc2s6l4.ap-southeast-1.rds.amazonaws.com",
+  host: dbConfig.HOST,
   dialect: dbConfig.dialect,
 
   pool: {
