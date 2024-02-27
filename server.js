@@ -15,30 +15,21 @@ app.use(express.json());
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 
-// const db = require("./app/models");
+const db = require("./app/models");
 
-const Sequelize = require("sequelize");
-const sequelize = new Sequelize("testdb", "postgres", "password", {
-  host: "skl-crud-nodejs.crigquc2s6l4.ap-southeast-1.rds.amazonaws.com",
-  dialect: "postgres",
-
+sequelize.authenticate().then(() => {
+  console.log('Connection has been established successfully.');
+}).catch((error) => {
+  console.error('Unable to connect to the database: ', error);
 });
 
-sequelize.sync()
+db.sequelize.sync()
   .then(() => {
     console.log("Synced db.");
   })
   .catch((err) => {
     console.log("Failed to sync db: " + err.message + err.stack);
   });
-
-// db.sequelize.sync()
-//   .then(() => {
-//     console.log("Synced db.");
-//   })
-//   .catch((err) => {
-//     console.log("Failed to sync db: " + err.message + err.stack);
-//   });
 
 // // drop the table if it already exists
 // db.sequelize.sync({ force: true }).then(() => {
