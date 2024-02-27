@@ -1,8 +1,8 @@
 module.exports = {
-  HOST: "skl-crud-db.crigquc2s6l4.ap-southeast-1.rds.amazonaws.com",
+  HOST: "skl-crud-nodejs.crigquc2s6l4.ap-southeast-1.rds.amazonaws.com:5432",
   USER: "postgres",
   PASSWORD: "password",
-  DB: "postgres",
+  DB: "testdb",
   dialect: "postgres",
   pool: {
     max: 5,
