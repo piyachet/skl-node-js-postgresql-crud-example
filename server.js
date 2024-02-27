@@ -17,12 +17,6 @@ app.use(express.urlencoded({ extended: true }));
 
 const db = require("./app/models");
 
-sequelize.authenticate().then(() => {
-  console.log('Connection has been established successfully.');
-}).catch((error) => {
-  console.error('Unable to connect to the database: ', error);
-});
-
 db.sequelize.sync()
   .then(() => {
     console.log("Synced db.");
